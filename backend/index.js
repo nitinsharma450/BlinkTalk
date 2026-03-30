@@ -6,7 +6,7 @@ import cookies from 'cookie-parser';
 dotenv.config();
 
 const app=express();
-app.use(express.cors());
+app.use(cors());
 app.use(express.json());
 
 const PORT=process.env.PORT;
