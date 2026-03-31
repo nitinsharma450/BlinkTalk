@@ -1,38 +1,56 @@
-import optGenerator from '../utils/optGenerator.js'
-import User from '../model/User.js'
+import otpGenerator from '../utils/otpGenerator.js';
+import User from '../model/User.js';
+import { sendOtpToPhone } from '../services/phoneNoService.js';
+import { sendOtpToEmail } from '../services/emailService.js';
+// import { sendOtpToEmail } from '../services/emailService.js';
 
-async function sendOtp(req,res){
-  let {phoneNo,email,PhoneSuffix}=req.body;
-  let user;
+async function sendOtp(req, res) {
+  const { phoneNo, email, phoneSuffix } = req.body;
 
-  if(!phoneNo || !PhoneSuffix){
-    return res.status(400).send({message:'phone number and phone suffix are required'})
+  if (!phoneNo && !email) {
+    return res.status(400).json({ message: 'Phone or Email required' });
   }
 
-  user=await User.findOne({phoneNo:phoneNo})
-  if(!user){
-    user=new User({phoneNo:phoneNo,PhoneSuffix:PhoneSuffix})
-  }
-  user.save();
+  const otp = otpGenerator();
 
-let opt=await optGenerator()
+  // 📱 PHONE OTP FLOW
+  if (phoneNo) {
+    let user = await User.findOne({ phoneNo });
 
-
-if(email){
-    let user=await User.findOne({email:email})
-    if(!user){
-        user=new User({email:user})
+    if (!user) {
+      user = new User({ phoneNo, phoneSuffix });
     }
-   user.emailOtp=opt;
-user.emailOtpExpiry=Date.now()+1000*60*5;
 
-await user.save()
+    user.phoneOtp = otp;
+    user.phoneOtpExpiry = Date.now() + 5 * 60 * 1000;
 
-return res.status(200).send({message:'opt send successfully to you email'})
+    await user.save();
+
+    await sendOtpToPhone(phoneNo);
+
+    return res.status(200).json({
+      message: 'OTP sent to phone'
+    });
+  }
+
+  // 📧 EMAIL OTP FLOW
+  if (email) {
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({ email });
+    }
+
+    user.emailOtp = otp;
+    user.emailOtpExpiry = Date.now() + 5 * 60 * 1000;
+
+    await user.save();
+
+     await sendOtpToEmail(email,otp);
+
+    return res.status(200).json({
+      message: 'OTP successfully sent to youremail'
+    });
+  }
 }
 
-
-
-
-    
-}
