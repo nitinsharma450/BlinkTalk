@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
     emailOtpExpiry:{type:Date},
     profilePicture:{type:String},
     isOnline:{type:Boolean},
-    lastSeen:{type:Date}
+    lastSeen:{type:Date},
+    isVarified:{type:Boolean}
 
 })
 
