@@ -8,7 +8,7 @@ const authToken=process.env.TWILIO_AUTH_TOKEN;
 
 const client=twilio(accountSid,authToken);
 
-export async function sendOptToPhone(phoneNo){
+export async function sendOtpToPhone(phoneNo){
  try {
     if(!phoneNo){
          throw new Error('phone number is required')
@@ -25,7 +25,7 @@ export async function sendOptToPhone(phoneNo){
  }
 }
 
-export async function verifyOpt(phoneNo,otp){
+export async function verifyOtp(phoneNo,otp){
 console.log(otp);
 console.log(phoneNo)
 

@@ -1,27 +1,32 @@
-import otpGenerator from "../utils/otpGenerator.js";
-import User from "../model/User.js";
-import { sendOtpToPhone, verifyOpt } from "../services/phoneNoService.js";
+
+
+import { sendOtpToPhone, verifyOtp } from "../services/phoneNoService.js";
 import { sendOtpToEmail } from "../services/emailService.js";
 import jwt from "jsonwebtoken";
+import { optGenerator } from "../utils/optGenerator.js";
+import { UserSchema } from "../model/User.js";
 
-async function sendOtp(req, res) {
+
+export class authController{
+
+ static async sendOtp(req, res) {
   const { phoneNo, email, phoneSuffix } = req.body;
 
   if (!phoneNo && !email) {
     return res.status(400).json({ message: "Phone or Email required" });
   }
 
-  const otp = otpGenerator();
+  const otp = await optGenerator();
 
   // 📱 PHONE OTP FLOW
   if (phoneNo) {
-    let user = await User.findOne({ phoneNo });
+    let user = await UserSchema.findOne({ phoneNo });
 
     if (!user) {
-      user = new User({ phoneNo, phoneSuffix });
+      user = new UserSchema({ phoneNo, phoneSuffix });
     }
 
-    user.phoneOtp = otp;
+    
     user.phoneOtpExpiry = Date.now() + 5 * 60 * 1000;
 
     await user.save();
@@ -35,10 +40,10 @@ async function sendOtp(req, res) {
 
   // 📧 EMAIL OTP FLOW
   if (email) {
-    let user = await User.findOne({ email });
+    let user = await UserSchema.findOne({ email });
 
     if (!user) {
-      user = new User({ email });
+      user = new UserSchema({ email });
     }
 
     user.emailOtp = otp;
@@ -54,7 +59,7 @@ async function sendOtp(req, res) {
   }
 }
 
-async function verifyOtp(req, res) {
+static async verifyOtp(req, res) {
   try {
     const { phoneNo, email, otp, phoneSuffix } = req.body;
 
@@ -92,7 +97,7 @@ async function verifyOtp(req, res) {
         return res.status(400).send({ message: "User not found" });
       }
       let phoneNumber = `${phoneSuffix}${phoneNo}`;
-      let result = await verifyOpt(phoneNumber, otp);
+      let result = await verifyOtp(phoneNumber, otp);
 
       if (result.status != "approved") {
         return res.status(400).send({ message: "Invalid or expired OTP" });
@@ -116,4 +121,5 @@ async function verifyOtp(req, res) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
+}
 }
