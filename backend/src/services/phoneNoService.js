@@ -27,6 +27,7 @@ export async function sendOptToPhone(phoneNo){
 
 export async function verifyOpt(phoneNo,otp){
 console.log(otp);
+console.log(phoneNo)
 
 try {
     const response=await client.verify.services(serviceId).verificationChecks.create({
