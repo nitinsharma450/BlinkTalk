@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config()
 
 const MONGO_URI = process.env.MONGO_URI;
-console.log("ewew",MONGO_URI);
+
 
 export async function MongoDB() {
   try {
@@ -17,6 +17,6 @@ export async function MongoDB() {
     console.log('✅ Connected to MongoDB');
   } catch (error) {
     console.error("❌ Database connection failed:", error.message);
-    process.exit(1); // stop app if DB fails
+    process.exit(1); 
   }
 }
