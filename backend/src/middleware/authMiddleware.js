@@ -2,25 +2,18 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-export async function authMiddleware(req, res, next) {
-  let header = req.header("authorization");
+export const authMiddleware = (req, res, next) => {
+  const token = req.cookies.token;
 
-  if (header && typeof header === "string") {
-    let chuncks = header.split(" ");
-    if (chuncks.length === 2 && chuncks[0] === "Bearer") {
-      if (chuncks == 2) {
-        let token = chuncks[1];
-
-        try {
-          let decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-          req.user = decoded;
-          next();
-          return;
-        } catch (error) {
-            console.log(error.message)
-            return res.status(403).send({message:'invalid token'});
-        }
-      }
-    }
+  if (!token) {
+    return res.status(401).json({ message: "Not authenticated" });
   }
-}
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};

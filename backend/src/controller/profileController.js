@@ -1,4 +1,4 @@
-import { UserSchema } from "../model/User";
+import { UserSchema } from "../model/User.js";
 
 export class profileController{
 static async updateProfile(req,res){
