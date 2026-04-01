@@ -1,7 +1,7 @@
 import express from 'express';
 import { authController } from '../controller/authController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
-import { profileController } from '../controller/profileController.js';
+import { userController } from '../controller/userController.js';
  
 
 export const authRouter=express.Router();
@@ -11,5 +11,6 @@ authRouter.post('/logout',authController.logout)
 
 authRouter.use(authMiddleware);
 
-authRouter.post('/updateprofile',profileController.updateProfile)
-authRouter.post('/checkAuth',authController.isAuthencated)
+authRouter.post('/updateprofile',userController.updateProfile)
+authRouter.post('/checkauth',authController.isAuthencated)
+authRouter.post('/allusers',userController.getAllUser)
