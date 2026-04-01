@@ -111,11 +111,11 @@ export class authController {
           process.env.JWT_SECRET_KEY,
           { expiresIn: "3h" },
         );
-         res.cookie("authToken", token, {
-            httpOnly: true, // 🔒 can't access from JS
+        res.cookie("authToken", token, {
+          httpOnly: true, // 🔒 can't access from JS
 
-            maxAge: 24 * 60 * 60 * 1000, // 1 day
-          });
+          maxAge: 24 * 60 * 60 * 1000, // 1 day
+        });
 
         return res.send({
           message: "opt verify successfylly",
@@ -127,5 +127,36 @@ export class authController {
       console.log(error);
       return res.status(500).json({ message: "Internal server error" });
     }
+  }
+
+  static async logout(req, res) {
+    try {
+      res.clearCookie("authToken");
+
+      return res.status(200).send("message:'Logout successfully");
+    } catch (error) {
+      return res.status(500).send({ message: "Internal Server Error" });
+    }
+  }
+  static async isAuthencated(req,res){
+    try {
+       const userId=req.user.userId;
+
+
+    if(!userId){
+      return res.status(401).send({message:'unauthorized'})
+    }
+
+    let user=await UserSchema.findById(userId)
+
+    if(!user){
+      return res.status(400).send({message:'user not found'})
+    }
+    return res.status(200).send({message:'user found allow to user app'})
+    } catch (error) {
+      console.log(error)
+      return res.status(500).send({message:'Internal Server Error'})
+    }
+   
   }
 }

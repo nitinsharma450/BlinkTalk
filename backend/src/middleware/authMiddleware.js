@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const authMiddleware = (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.cookies.authToken;
 
   if (!token) {
     return res.status(401).json({ message: "Not authenticated" });
