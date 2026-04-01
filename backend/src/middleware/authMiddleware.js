@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-async function authMiddleware(req, res, next) {
+export async function authMiddleware(req, res, next) {
   let header = req.header("authorization");
 
   if (header && typeof header === "string") {
