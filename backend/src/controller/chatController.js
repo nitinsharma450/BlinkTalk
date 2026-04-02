@@ -1,4 +1,4 @@
-import { ERROR_CODES } from "nodemailer/lib/errors";
+import { uploadFileToCloudinary } from "../utils/cloudinaryConfig";
 import { ConversationSchema } from "../model/Converation";
 import { MessageSchema } from "../model/Message";
 
