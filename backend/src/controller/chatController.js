@@ -1,6 +1,6 @@
-import { uploadFileToCloudinary } from "../utils/cloudinaryConfig";
-import { ConversationSchema } from "../model/Converation";
-import { MessageSchema } from "../model/Message";
+import { uploadFileToCloudinary } from "../utils/cloudinaryConfig.js";
+import { ConversationSchema } from "../model/Converation.js";
+import { MessageSchema } from "../model/Message.js";
 
 export class chatController {
   static async sendMessage(req, res) {
