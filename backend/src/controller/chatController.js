@@ -105,4 +105,45 @@ export class chatController {
       return res.status(500).send({ message: "Internal server error" });
     }
   }
+
+  static async markAsRead(req,res){
+    const messageId=eq.body;
+    const userId=req.user.userId;
+
+    try {
+      let message=await MessageSchema.findOne({_id:{in:messageId},receiver:userId})
+
+      message.updateMany({_id:{in:messageId},receiver:userId},
+        {$set:{messageStatus:'read'}}
+      )
+
+      return res.status(200).send({message:'Message Mark as Read Successfully',response:message})
+    } catch (error) {
+       console.log(error);
+      return res.status(500).send({ message: "Internal server error" });
+    }
+  }
+
+  static async deleteMessage(req,res){
+    const messageId=req.body;
+    const userId=req.user.userId;
+
+    try {
+    let message= MessageSchema.findById({_id:messageId})
+
+   if(!message){
+   return res.status(404).send({message:'Message Not Found'})
+   }
+
+   if(message.sender.toString()!==userId){
+    return  res.status(403).send({message:'Not Authorized to Delete this Message'})
+   }
+   await message.deleteOne()
+
+   return res.status(200).send({message:'Message Deleted Successfully'})
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ message: "Internal server error" });
+    }
+  }
 }
