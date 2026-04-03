@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
  
 import {MongoDB} from "./connection.js";
 import { authRouter } from "./src/routes/authRoute.js";
+import { chatRoute } from "./src/routes/chatRoute.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 
 
 app.use('api/auth',authRouter)
+app.use('api/chat',chatRoute)
 
 const PORT = process.env.PORT;
 

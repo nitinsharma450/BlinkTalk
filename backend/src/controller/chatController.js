@@ -106,7 +106,7 @@ export class chatController {
     }
   }
 
-  static async markAsRead(req,res){
+  static async markAsRead(req,res){ 
     const messageId=eq.body;
     const userId=req.user.userId;
 
@@ -125,7 +125,7 @@ export class chatController {
   }
 
   static async deleteMessage(req,res){
-    const messageId=req.body;
+    const {messageId}=req.param;
     const userId=req.user.userId;
 
     try {
