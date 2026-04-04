@@ -60,37 +60,63 @@ export async function initializeSocket(server) {
       }
     });
 
-    socket.on("typing_start", (conversationId, recevierId) => {
-      if (!conversationId || !recevierId) {
+    socket.on("typing_start", (conversationId, recieverId) => {
+      if (!conversationId || !recieverId) {
         return;
       }
 
-      if(!typingUser.has(userId)){
-        typingUser.set(userId,{})
+      if (!typingUser.has(userId)) {
+        typingUser.set(userId, {});
       }
-      const userTyping=typingUser.get(userId)
+      const userTyping = typingUser.get(userId);
 
-      if(userTyping){
-        userTyping[conversationId]=true
+      if (userTyping) {
+        userTyping[conversationId] = true;
       }
-      if(userTyping[`${conversationId}_timeout`]){
-        clearTimeout(userTyping[`${conversationId}_timeout`])
+      if (userTyping[`${conversationId}_timeout`]) {
+        clearTimeout(userTyping[`${conversationId}_timeout`]);
       }
 
-      userTyping[`${conversationId}_timeout`]=setTimeout(()=>{
-       userTyping[conversationId]=false
-       socket.to(recevierId).emit('user_typing',{
+      userTyping[`${conversationId}_timeout`] = setTimeout(() => {
+        userTyping[conversationId] = false;
+        socket.to(recieverId).emit("user_typing", {
+          userId,
+          conversationId,
+          isTyping: false,
+        });
+      }, 3000);
+
+      socket.to(recieverId).emit("user_typing", {
         userId,
         conversationId,
-        isTyping:false
-       })  
-      },3000)
-
-      socket.to(recevierId).emit('user_typing',{
-        userId,
-        conversationId,
-        istyping:true
-      })
+        istyping: true,
+      });
     });
+
+    socket.on("typing_stop", (conversationId, recieverId) => {
+      if (!conversationId || !recieverId) {
+        return;
+      }
+
+      if (typingUser.has(userId)) {
+        const userTyping = typingUser.get(userId);
+        userTyping[conversationId] = false;
+
+        if (userTyping[`${conversationId}_timeout`]) {
+          clearTimeout(userTyping[`${conversationId}_timeout`]);
+          delete userTyping[`${conversationId}_timeout`];
+        }
+
+        socket.to(recieverId).emit("user_typing", {
+          userId,
+          conversationId,
+          isTyping: false,
+        });
+      }
+    });
+
+
+
+    
   });
 }
