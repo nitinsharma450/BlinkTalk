@@ -29,7 +29,7 @@ export class authController {
       await sendOtpToPhone(phoneNo);
 
       return res.status(200).json({
-        message: "OTP sent to phone",
+        data: "OTP sent to phone",
       });
     }
 
@@ -49,7 +49,7 @@ export class authController {
       await sendOtpToEmail(email, otp);
 
       return res.status(200).json({
-        message: "OTP successfully sent to youremail",
+        data: "OTP successfully sent to youremail",
       });
     }
   }
@@ -152,7 +152,7 @@ export class authController {
     if(!user){
       return res.status(400).send({message:'user not found'})
     }
-    return res.status(200).send({message:'user found allow to user app'})
+    return res.status(200).send({message:'user found allow to user app',status:200})
     } catch (error) {
       console.log(error)
       return res.status(500).send({message:'Internal Server Error'})
