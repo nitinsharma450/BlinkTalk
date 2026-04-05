@@ -57,6 +57,19 @@ export class chatController {
       conversation.unreadMessageCount += 1;
       await conversation.save();
 
+      const populateMessage = await MessageSchema.findOne(message?._id)
+        .populate("sender", "userName profilePicture")
+        .populate("reciever", "userName profilePicture");
+
+      if (req.io && req.socketUserMap) {
+        const recieverSocketId = req.socketUserMap.get(receiverId);
+        if (recieverSocketId) {
+          req.io.to(recieverSocketId).emit("recieve_message", populateMessage);
+          message.messageStatus = "delivered";
+          await message.save();
+        }
+      }
+
       return res
         .status(200)
         .send({ message: "Message sent successfully", data: message });
@@ -99,48 +112,84 @@ export class chatController {
       conversation.unreadCount = 0;
       await conversation.save();
 
-      return res.status(200).send({ message: "Messages retrieved successfully", data: messages });
+      return res
+        .status(200)
+        .send({ message: "Messages retrieved successfully", data: messages });
     } catch (error) {
       console.log(error);
       return res.status(500).send({ message: "Internal server error" });
     }
   }
 
-  static async markAsRead(req,res){ 
-    const messageId=eq.body;
-    const userId=req.user.userId;
+  static async markAsRead(req, res) {
+    const messageId = eq.body;
+    const userId = req.user.userId;
 
     try {
-      let message=await MessageSchema.findOne({_id:{in:messageId},receiver:userId})
+      let messages = await MessageSchema.findOne({
+        _id: { in: messageId },
+        receiver: userId,
+      });
 
-      message.updateMany({_id:{in:messageId},receiver:userId},
-        {$set:{messageStatus:'read'}}
-      )
+      messages.updateMany(
+        { _id: { in: messageId }, receiver: userId },
+        { $set: { messageStatus: "read" } },
+      );
 
-      return res.status(200).send({message:'Message Mark as Read Successfully',response:message})
+      if (req.io && req.socketUserMap) {
+        for (const message of messages) {
+          const senderSocketId = req.socketUserMap.get(
+            message.sender._id.toString(),
+          );
+          if (senderSocketId) {
+            const updatedMessage = {
+              messageId: message._id,
+              messageStatus: "read",
+            };
+            res.io.to(senderSocketId).emit("message_read", updatedMessage);
+            await message.save();
+          }
+        }
+      }
+
+      return res.status(200).send({
+        message: "Message Mark as Read Successfully",
+        response: messages,
+      });
     } catch (error) {
-       console.log(error);
+      console.log(error);
       return res.status(500).send({ message: "Internal server error" });
     }
   }
 
-  static async deleteMessage(req,res){
-    const {messageId}=req.param;
-    const userId=req.user.userId;
+  static async deleteMessage(req, res) {
+    const { messageId } = req.param;
+    const userId = req.user.userId;
 
     try {
-    let message= MessageSchema.findById({_id:messageId})
+      let message = MessageSchema.findById({ _id: messageId });
 
-   if(!message){
-   return res.status(404).send({message:'Message Not Found'})
-   }
+      if (!message) {
+        return res.status(404).send({ message: "Message Not Found" });
+      }
 
-   if(message.sender.toString()!==userId){
-    return  res.status(403).send({message:'Not Authorized to Delete this Message'})
-   }
-   await message.deleteOne()
+      if (message.sender.toString() !== userId) {
+        return res
+          .status(403)
+          .send({ message: "Not Authorized to Delete this Message" });
+      }
+      await message.deleteOne();
 
-   return res.status(200).send({message:'Message Deleted Successfully'})
+      if (req.io && req.socketUserMap) {
+        const recieverSocketId = req.socketUserMap.get(
+          message.reciever._id.toString(),
+        );
+        if (recieverSocketId) {
+          res.io.to(recieverSocketId).emit("message_delete", messageId);
+        }
+      }
+
+      return res.status(200).send({ message: "Message Deleted Successfully" });
     } catch (error) {
       console.log(error);
       return res.status(500).send({ message: "Internal server error" });

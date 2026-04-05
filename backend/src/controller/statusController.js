@@ -39,9 +39,21 @@ export class statusController {
       });
       await status.save();
 
+      const populateStatus = await StatusSchema.find(status?._id)
+        .populate("user", "userName profilePicture")
+        .populate("viewers", "userName profilePicture");
+
+    if(req.io  && req.socketUserMap){
+      for(const [connectedUserId,socketId] of req.socketUserMap){
+           if(userId!==connectedUserId){
+            req.io.to(socketId).emit("new_status",populateStatus)
+           }
+      }
+    }
+
       return res
         .status(200)
-        .send({ message: "status sent successfully", data: status });
+        .send({ message: "status sent successfully", data: populateStatus });
     } catch (error) {
       console.log(error);
       return res.status(500).send({ message: "Internal server error" });
@@ -77,9 +89,27 @@ export class statusController {
 
         await status.save();
 
-        StatusSchema.findById({ _id: statusId })
+        const updatedStatus=StatusSchema.findById({ _id: statusId })
           .populate("user", "userName profilePicture")
           .populate("viewer", "userName profilePicture");
+
+
+          if(req.io  && req.socketUserMap){
+           const statusOwnerId=req.socketUserMap.get(StatusSchema.user._id.toString());
+           if(statusOwnerId){
+            const viewData={
+              statusId,
+              viewerId:userId,
+              totalViewers:updatedStatus.viewers.length,
+              viewer:updatedStatus.viewers
+            }
+
+            res.io.to(statusOwnerId).emit("status_view",viewData)
+           }
+           else{
+            console.log("status owner not connected")
+           }
+    }
       } else {
         console.log("status already viewed by the user");
       }
@@ -89,19 +119,27 @@ export class statusController {
     }
   }
 
-  static async deleteStatus(req,res){
-    const {statusId}=req.param;
+  static async deleteStatus(req, res) {
+    const { statusId } = req.param;
 
     try {
-        let status=StatusSchema.find({_id:statusId})
-        if(!status){
-            return res.status(400).send({message:'status not found'})
-        }
-        await status.deleteOne()
+      let status = StatusSchema.find({ _id: statusId });
+      if (!status) {
+        return res.status(400).send({ message: "status not found" });
+      }
+      await status.deleteOne();
 
-        return res.status(200).send({message:'status deleted successfully'})
+      if(req.io  && req.socketUserMap){
+      for(const [connectedUserId,socketId] of req.socketUserMap){
+           if(userId!==connectedUserId){
+            req.io.to(socketId).emit("status_delete",populateStatus)
+           }
+      }
+    }
+
+      return res.status(200).send({ message: "status deleted successfully" });
     } catch (error) {
-        console.log(error);
+      console.log(error);
       return res.status(500).send({ message: "Internal server error" });
     }
   }
