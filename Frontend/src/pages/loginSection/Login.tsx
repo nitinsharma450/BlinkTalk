@@ -14,23 +14,46 @@ export default function login() {
     }
   }
 
-
-  async function verifyOtp(phoneNo:any,email:any,otp:any,phoneSuffix:any){
-let response=await axiosInstance.post('/api/auth/verifyotp',{phoneNo,email,otp,phoneSuffix})
-console.log(response?.data.message)
+  async function verifyOtp(
+    phoneNo: any,
+    email: any,
+    otp: any,
+    phoneSuffix: any,
+  ) {
+    let response = await axiosInstance.post("/api/auth/verifyotp", {
+      phoneNo,
+      email,
+      otp,
+      phoneSuffix,
+    });
+    console.log(response?.data.message);
   }
 
-  async function checkAuth(){
+  async function checkAuth() {
     try {
-        let response=await axiosInstance.post('/api/auth/checkauth')
-    if(response.data.status==200){
-     console.log(response.data)
-    }
+      let response = await axiosInstance.post("/api/auth/checkauth");
+      if (response.data.status == 200) {
+        console.log(response.data);
+      }
     } catch (error) {
-        console.log(error)
+      console.log(error);
     }
-    
   }
 
-  return <></>;
+  async function logout() {
+    try {
+      let response = await axiosInstance.post("/api/auth/logout");
+      if (response) {
+        console.log(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+
+  return <>
+  
+  </>;
 }
