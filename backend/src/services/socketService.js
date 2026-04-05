@@ -1,7 +1,8 @@
 import { Server } from "socket.io";
 import dotenv from "dotenv";
-import { UserSchema } from "../model/User";
-import { MessageSchema } from "../model/Message";
+import { UserSchema } from "../model/User.js";
+import { MessageSchema } from "../model/Message.js";
+
 dotenv.config();
 
 const onlineUser = new Map();
@@ -18,6 +19,8 @@ export async function initializeSocket(server) {
 
   io.on("connection", (socket) => {
     console.log(socket.id, "connected to the server");
+
+    let userId = null;
 
     socket.on("connecting_user", async (userId) => {
       try {
@@ -115,8 +118,45 @@ export async function initializeSocket(server) {
       }
     });
 
+    //handle disconnect and mark user offline
 
+    const handleDisconnect = async () => {
+      try {
+        if (!userId) {
+          return;
+        }
+        onlineUser.delete(userId);
 
-    
+        //clear all timeout
+
+        if (typingUser.has(userId)) {
+          const userTyping = userTyping.get(userId);
+          Object.keys(userTyping).forEach((key) => {
+            if (key.endsWith("_timeout")) clearTimeout(userTyping[key]);
+          });
+          typingUser.delete(userId);
+        }
+        UserSchema.findByIdAndUpdate(userId, {
+          isOnline: false,
+          lastSeen: new Date(),
+        });
+
+        io.emit("user_status", {
+          userId,
+          isOnline: false,
+          lastSeen: new Date(),
+        });
+
+        socket.leave(userId);
+        console.log(`user ${userId} disconnected`);
+      } catch (error) {
+        console.log("error in handling disconnect", error);
+      }
+    };
+
+    socket.on('disconnect',handleDisconnect)
+    io.socketUserMap=onlineUser
+
+    return io;
   });
 }

@@ -1,4 +1,4 @@
-import { StatusSchema } from "../model/Status";
+import { StatusSchema } from "../model/Status.js";
 
 export class statusController {
   static async createStatus(req, res) {
