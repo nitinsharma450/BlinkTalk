@@ -9,12 +9,12 @@ const useLoginStore = create(
       userPhoneData: null,
 
       
-      setStep: (newStep) =>
+      setStep: (newStep:any) =>
         set(() => ({
           step: newStep,
         })),
 
-      setUserPhoneData: (data) =>
+      setUserPhoneData: (data:any) =>
         set(() => ({
           userPhoneData: data,
         })),
@@ -29,7 +29,7 @@ const useLoginStore = create(
       name: "login-storage", // localStorage key
 
       // 🔹 Only persist required fields
-      partialize: (state) => ({
+      partialize: (state:any) => ({
         step: state.step,
         userPhoneData: state.userPhoneData,
       }),
