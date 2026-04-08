@@ -1,7 +1,7 @@
   const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
 
-  export default function formatTimestamp(timestamp) {
+  export default function formatTimestamp(timestamp:any) {
   const now = Date.now();
     const messageTime = new Date(timestamp).getTime();
     const diff = now - messageTime;
@@ -13,7 +13,7 @@
 
 
 
-  const avatars = [
+  export const avatars = [
   'https://api.dicebear.com/6.x/avataaars/svg?seed=Felix',
   'https://api.dicebear.com/6.x/avataaars/svg?seed=Aneka',
   'https://api.dicebear.com/6.x/avataaars/svg?seed=Mimi',
