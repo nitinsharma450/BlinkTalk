@@ -12,6 +12,9 @@ import { useThemeStore } from "../../store/useThemeStore";
 import { motion } from "framer-motion";
 import { FaChevronDown, FaUser, FaWhatsapp } from "react-icons/fa";
 import { p } from "framer-motion/client";
+import { CgSpinner } from "react-icons/cg";
+import Spinner from "../../utils/Spinner";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const { step, setStep, userPhoneData, setUserPhoneData, resetLoginState } =
@@ -29,6 +32,7 @@ export default function Login() {
   const [avatar, setAvatar] = useState(avatars[0]);
   const [showDropDown, setShowDropDown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading,setLoading]=useState(false)
   const navigate = useNavigate();
   const { setUser } = useUserStore();
 
@@ -97,10 +101,25 @@ export default function Login() {
         email,
         phoneSuffix,
       });
+      
       console.log(response.data);
+      return response.data
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async function loginHandle(){
+    if(email){
+     let response=await sendOtp(null,email,null)
+     if(response.data.message==='success'){
+      toast.info("Opt send to you email")
+
+      setUserPhoneData({email})
+      setStep(2)
+     }
+    }
+   
   }
 
   async function verifyOtp(
@@ -290,13 +309,20 @@ export default function Login() {
                   placeholder="Email (optional)"
                   className={`w-full px-4 py-2 border ${
                     theme === "dark"
-                      ? "bg-gray-700 border-gray-600 text-white"
-                      : "bg-white border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                      ? " text-white"
+                      : "bg-white"
+                  }${
                     loginErrors.phoneNumber ? "border-red-500" : ""
                   }`}
                 />
               </div>
+               {loginErrors.email && (
+                  <p className="text-red-500 text-sm">
+                    {loginErrors.email.message}
+                  </p>
+                )}
+
+                <button className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">{!loading ?<Spinner />:'Send Otp'}</button>
             </form>
           )}
         </motion.div>

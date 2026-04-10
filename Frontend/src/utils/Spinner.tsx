@@ -1,15 +1,15 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 import { FaSpinner } from 'react-icons/fa';
 
 export default function Spinner({ size = 'medium', color = 'light' }) {
-  const sizeClasses = {
+  const sizeClasses:any = {
     small: 'text-xs',
     medium: 'text-lg',
     large: 'text-2xl',
   };
 
-  const colorClasses = {
+  const colorClasses:any = {
     light: 'text-white',
     dark: 'text-gray-800',
   };
