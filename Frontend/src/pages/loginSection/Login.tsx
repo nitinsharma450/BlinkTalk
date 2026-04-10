@@ -10,8 +10,8 @@ import { useForm } from "react-hook-form";
 import { avatars } from "../../utils/data";
 import { useThemeStore } from "../../store/useThemeStore";
 import { motion } from "framer-motion";
-import { FaChevronDown, FaWhatsapp } from "react-icons/fa";
-
+import { FaChevronDown, FaUser, FaWhatsapp } from "react-icons/fa";
+import { p } from "framer-motion/client";
 
 export default function Login() {
   const { step, setStep, userPhoneData, setUserPhoneData, resetLoginState } =
@@ -244,7 +244,58 @@ export default function Login() {
                       </div>
                     )}
                   </div>
+
+                  <input
+                    type="text"
+                    placeholder="Enter Phone Number"
+                    {...loginRegister("phoneNumber")}
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className={`w-2/3 px-4 py-2 border  ${theme === "dark" ? "text-white bg-gray-600 border-gray-700" : " border-gray-300"} rounded-md focus:outline-none focus:right-2 focus:ring-green-200 ${loginErrors.phoneNumber ? "border-red-500" : ""}`}
+                  />
                 </div>
+                {loginErrors.phoneNumber && (
+                  <p className="text-red-500 text-sm">
+                    {loginErrors.phoneNumber.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center" my-4>
+                <div className="flex-grow h-px bg-gray-300" />
+                <span className="mx-3 text-gray-500 text-sm font-medium">
+                  Or
+                </span>
+                <div className="flex-grow h-px bg-gray-300" />
+              </div>
+
+              <div
+                className={`flex items-center border rounded-md px-3 py-2 ${
+                  theme === "dark"
+                    ? "bg-gray-700 border-gray-600"
+                    : "bg-white border-gray-300"
+                }`}
+              >
+                <FaUser
+                  className={`mr-2 text-gray-400 ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}
+                />
+
+                <input
+                  type="email"
+                  {...loginRegister("email")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email (optional)"
+                  className={`w-full px-4 py-2 border ${
+                    theme === "dark"
+                      ? "bg-gray-700 border-gray-600 text-white"
+                      : "bg-white border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                    loginErrors.phoneNumber ? "border-red-500" : ""
+                  }`}
+                />
               </div>
             </form>
           )}
