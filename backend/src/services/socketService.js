@@ -51,11 +51,11 @@ export async function initializeSocket(server) {
         $set: { messageStatus: "read" },
       });
 
-      const sockerSenderId = isOnline.get(senderId);
+      const socketSenderId = isOnline.get(senderId);
 
-      if (sockerSenderId) {
+      if (socketSenderId) {
         messageIds.forEach((messageId) => {
-          io.to(sockerSenderId).emit("message_status_update", {
+          io.to(socketSenderId).emit("message_status_update", {
             messageId,
             messageStatus: "read",
           });

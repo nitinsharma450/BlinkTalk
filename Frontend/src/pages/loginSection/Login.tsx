@@ -114,10 +114,10 @@ export default function Login() {
       setLoading(true);
       if (email) {
         let response = await sendOtp(
-          phoneNumber,
           null,
-          selectedCountry.dialCode,
-        );
+          email,
+          null
+                );
         if (response.data.message === "success") {
           toast.info("Opt send to you phone number");
 
@@ -128,7 +128,7 @@ export default function Login() {
           setStep(2);
         }
       } else {
-        let response = await sendOtp(null, email, null);
+        let response = await sendOtp(phoneNumber, null, selectedCountry.dialCode);
         if (response.data.message === "success") {
           toast.info("Opt send to you email");
 
@@ -451,7 +451,7 @@ export default function Login() {
                 <button className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
                   {loading ? <Spinner /> : "verify Otp"}
                 </button>
-                
+
                 <button
                   onClick={handleBack}
                   className={`w-full mt-2 ${theme === "dark" ? "bg-gray-500 text-gray-600" : "bg-gray-500 text-black"} py-2  rounded-md hover:bg-gray-300 transition flex items-center justify-center`}

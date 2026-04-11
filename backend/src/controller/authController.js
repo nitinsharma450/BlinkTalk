@@ -5,54 +5,54 @@ import { optGenerator } from "../utils/optGenerator.js";
 import { UserSchema } from "../model/User.js";
 
 export class authController {
-  static async sendOtp(req, res) {
-    const { phoneNo, email, phoneSuffix } = req.body;
+    static async sendOtp(req, res) {
+      const { phoneNo, email, phoneSuffix } = req.body;
 
-    if (!phoneNo && !email) {
-      return res.status(400).json({ message: "Phone or Email required" });
-    }
-
-    const otp = await optGenerator();
-
-    // 📱 PHONE OTP FLOW
-    if (phoneNo) {
-      let user = await UserSchema.findOne({ phoneNo });
-
-      if (!user) {
-        user = new UserSchema({ phoneNo, phoneSuffix });
+      if (!phoneNo && !email) {
+        return res.status(400).json({ message: "Phone or Email required" });
       }
 
-      user.phoneOtpExpiry = Date.now() + 5 * 60 * 1000;
+      const otp = await optGenerator();
 
-      await user.save();
+      // 📱 PHONE OTP FLOW
+      if (phoneNo) {
+        let user = await UserSchema.findOne({ phoneNo });
 
-      await sendOtpToPhone(phoneNo);
+        if (!user) {
+          user = new UserSchema({ phoneNo, phoneSuffix });
+        }
 
-      return res.status(200).json({
-        data: "OTP sent to phone",
-      });
-    }
+        user.phoneOtpExpiry = Date.now() + 5 * 60 * 1000;
 
-    // 📧 EMAIL OTP FLOW
-    if (email) {
-      let user = await UserSchema.findOne({ email });
+        await user.save();
 
-      if (!user) {
-        user = new UserSchema({ email });
+        await sendOtpToPhone(phoneNo,phoneSuffix);
+
+        return res.status(200).json({
+          data: "success",
+        });
       }
 
-      user.emailOtp = otp;
-      user.emailOtpExpiry = Date.now() + 5 * 60 * 1000;
+      // 📧 EMAIL OTP FLOW
+      if (email) {
+        let user = await UserSchema.findOne({ email });
 
-      await user.save();
+        if (!user) {
+          user = new UserSchema({ email });
+        }
 
-      await sendOtpToEmail(email, otp);
+        user.emailOtp = otp;
+        user.emailOtpExpiry = Date.now() + 5 * 60 * 1000;
 
-      return res.status(200).json({
-        data: "OTP successfully sent to youremail",
-      });
+        await user.save();
+
+        await sendOtpToEmail(email, otp);
+
+        return res.status(200).json({
+          data: "success",
+        });
+      }
     }
-  }
 
   static async verifyOtp(req, res) {
     try {

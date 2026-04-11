@@ -13,7 +13,12 @@ import { statusRoute } from "./src/routes/statusRoute.js";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.use(cookieParser());
@@ -29,9 +34,9 @@ app.use((req,res,next)=>{
 })
 
 
-app.use('api/auth',authRouter)
-app.use('api/chat',chatRoute)
-app.use('api/status',statusRoute)
+app.use('/api/auth',authRouter)
+app.use('/api/chat',chatRoute)
+app.use('/api/status',statusRoute)
 
 const PORT = process.env.PORT;
 

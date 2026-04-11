@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema({
-    userName:{type:String ,required:true,unique:true},
-    phoneNo:{type:String ,required:true,unique:true},
-    PhoneSuffix:{type:String,required:true},
-    email:{type:String,required:true,unique:true,lowercase:true},
+    userName:{type:String ,unique:true},
+    phoneNo:{type:String ,unique:true},
+    phoneSuffix:{type:String},
+    email:{type:String,unique:true,lowercase:true},
     about:{type:String},
     emailOtp:{type:String},
     emailOtpExpiry:{type:Date},

@@ -5,7 +5,7 @@ import { userController } from '../controller/userController.js';
  
 
 export const authRouter=express.Router();
-authRouter.post('/sendOpt',authController.sendOtp)
+authRouter.post('/sendOtp',authController.sendOtp)
 authRouter.post('/verifyOtp',authController.verifyOtp)
 authRouter.post('/logout',authController.logout)
 
