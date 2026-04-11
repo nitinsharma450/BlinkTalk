@@ -31,7 +31,7 @@ export default function App() {
     </Route>
 
     <Route element={<ProtectedRoute />}>
-
+   <Route path="/" element={} />
     </Route>
 
     
