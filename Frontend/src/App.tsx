@@ -3,6 +3,7 @@ import { Routes } from "react-router";
 import { BrowserRouter } from "react-router";
 import Login from "./pages/loginSection/Login";
 import { ToastContainer } from "react-toastify";
+import { ProtectedRoute, PublicRoute } from "./protected";
 
 
 export default function App() {
@@ -24,7 +25,15 @@ export default function App() {
 
         <BrowserRouter>
    <Routes>
-<Route element={<Login />} path="/login" />
+
+    <Route element={<PublicRoute />}>
+     <Route element={<Login />} path="/login" />
+    </Route>
+
+    <Route element={<ProtectedRoute />}>
+
+    </Route>
+
     
    </Routes>
    

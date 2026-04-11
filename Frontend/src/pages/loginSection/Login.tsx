@@ -102,40 +102,39 @@ export default function Login() {
         phoneSuffix,
       });
 
-      console.log(response.data);
+      console.log(response.data.data);
       return response.data;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async function loginHandle() {
+  async function loginHandle(e:any) {
+    e.preventDefault();
     try {
       setLoading(true);
-      if (email) {
-        let response = await sendOtp(
-          null,
-          email,
-          null
-                );
-        if (response.data.message === "success") {
-          toast.info("Opt send to you phone number");
+     if (email) {
+  let response = await sendOtp(null, email, null);
 
-          setUserPhoneData({
-            phoneNumber,
-            phoneSuffix: selectedCountry.dialCode,
-          });
-          setStep(2);
-        }
-      } else {
-        let response = await sendOtp(phoneNumber, null, selectedCountry.dialCode);
-        if (response.data.message === "success") {
-          toast.info("Opt send to you email");
+  if (response?.data === "success") {
+    toast.info("OTP sent to your email");
 
-          setUserPhoneData({ email });
-          setStep(2);
-        }
-      }
+    setUserPhoneData({ email });
+    setStep(2);
+  }
+} else {
+  let response = await sendOtp(phoneNumber, null, selectedCountry.dialCode);
+
+  if (response?.data === "success") {
+    toast.info("OTP sent to your phone");
+
+    setUserPhoneData({
+      phoneNumber,
+      phoneSuffix: selectedCountry.dialCode,
+    });
+    setStep(2);
+  }
+}
     } catch (error) {
       console.log(error);
       setError("fail to send otp");
@@ -225,11 +224,12 @@ export default function Login() {
           userPhoneData.phoneNumber,
           null,
           otpString,
-          userPhoneData.phoneSuffux.dialCode,
+          userPhoneData.phoneSuffix,
         );
       }
+      console.log(response)
 
-      if (response.message === "success") {
+      if (response?.data === "success") {
         toast.success("OTP verify successfully");
 
         const user = response?.user;
@@ -372,7 +372,7 @@ export default function Login() {
                 )}
               </div>
 
-              <div className="flex items-center" my-4>
+              <div className="flex items-center my-4" >
                 <div className="flex-grow h-px bg-gray-300" />
                 <span className="mx-3 text-gray-500 text-sm font-medium">
                   Or
@@ -410,14 +410,14 @@ export default function Login() {
                 </p>
               )}
 
-              <button className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
+              <button type="submit" className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
                 {loading ? <Spinner /> : "Send Otp"}
               </button>
             </form>
           )}
 
           {step == 2 && (
-            <form action="">
+            <form  onSubmit={(e) => { e.preventDefault(); onOtpSubmit(); }}>
               <p>
                 The 6-digit OTP sent to your{" "}
                 {userPhoneData?.phoneSuffix ? "phone" : "Email"} (
@@ -448,7 +448,7 @@ export default function Login() {
                   </p>
                 )}
 
-                <button className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
+                <button  type="submit" className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
                   {loading ? <Spinner /> : "verify Otp"}
                 </button>
 

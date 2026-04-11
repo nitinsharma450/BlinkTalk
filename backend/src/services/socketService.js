@@ -8,10 +8,10 @@ dotenv.config();
 const onlineUser = new Map();
 const typingUser = new Map();
 
-export async function initializeSocket(server) {
+export  async function initializeSocket(server) {
   const io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL,
+      origin:"http://localhost:5173",
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE"],
     },
@@ -36,7 +36,7 @@ export async function initializeSocket(server) {
       }
     });
 
-    socket.io("get_user_status", (userId, callback) => {
+    socket.on("get_user_status", (userId, callback) => {
       const onlineStatus = onlineUser.has(userId);
       callback({
         userId: userId,
@@ -51,7 +51,7 @@ export async function initializeSocket(server) {
         $set: { messageStatus: "read" },
       });
 
-      const socketSenderId = isOnline.get(senderId);
+      const socketSenderId = onlineUser.get(senderId);
 
       if (socketSenderId) {
         messageIds.forEach((messageId) => {
@@ -157,6 +157,7 @@ export async function initializeSocket(server) {
     socket.on('disconnect',handleDisconnect)
     io.socketUserMap=onlineUser
 
-    return io;
+    
   });
+  return io;
 }

@@ -54,10 +54,10 @@ export async function sendOtpToPhone(phoneNo, phoneSuffix) {
 
 export async function verifyOtp(phoneNo,otp){
 console.log(otp);
-console.log(phoneNo)
+console.log("verify number",phoneNo)
 
 try {
-    const response=await client.verify.services(serviceId).verificationChecks.create({
+    const response=await client.verify.v2.services(serviceId).verificationChecks.create({
         to:phoneNo,
         code :otp
     })
@@ -65,8 +65,8 @@ try {
     console.log(response)
     return response
 } catch (error) {
-    console.lof(error.message)
-    throw new error('otp verfication failed!');
+    console.log(error.message)
+    throw new Error('otp verfication failed!');
 }
 
 

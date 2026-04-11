@@ -25,8 +25,9 @@ export class authController {
         user.phoneOtpExpiry = Date.now() + 5 * 60 * 1000;
 
         await user.save();
-
+        console.log('before otp send')
         await sendOtpToPhone(phoneNo,phoneSuffix);
+          console.log('after otp send')
 
         return res.status(200).json({
           data: "success",
@@ -58,14 +59,14 @@ export class authController {
     try {
       const { phoneNo, email, otp, phoneSuffix } = req.body;
 
-      if (!phoneNo || !email) {
+      if (!phoneNo && !email) {
         return res.status(400).json({ message: "Phone or Email required" });
       }
 
-      if (email) {
-        let userInfo = await User.findOne({ email });
+      if (email) {  
+        let userInfo = await UserSchema.findOne({ email });
         if (userInfo.emailOtp === otp && userInfo.emailOtpExpiry > Date.now()) {
-          userInfo.isVerified = true;
+          userInfo.isVarified = true;
           userInfo.otp = null;
           userInfo.emailOtpExpiry = null;
           await userInfo.save();
@@ -93,7 +94,7 @@ export class authController {
       }
 
       if (phoneNo) {
-        let userInfo = await User.findOne({ phoneNo });
+        let userInfo = await UserSchema.findOne({ phoneNo });
         if (!userInfo) {
           return res.status(400).send({ message: "User not found" });
         }
@@ -103,7 +104,7 @@ export class authController {
         if (result.status != "approved") {
           return res.status(400).send({ message: "Invalid or expired OTP" });
         }
-        userInfo.isVerified = true;
+        userInfo.isVarified = true;
         await userInfo.save();
 
         const token = jwt.sign(
@@ -118,7 +119,7 @@ export class authController {
         });
 
         return res.send({
-          message: "opt verify successfylly",
+          data: "success",
           Token: token,
           user: userInfo,
         });
@@ -152,7 +153,9 @@ export class authController {
     if(!user){
       return res.status(400).send({message:'user not found'})
     }
-    return res.status(200).send({message:'user found allow to user app',status:200})
+
+    u
+    return res.status(200).send({message:'user found allow to user app',status:200,user,isAuthencated:true})
     } catch (error) {
       console.log(error)
       return res.status(500).send({message:'Internal Server Error'})

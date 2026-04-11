@@ -5,18 +5,18 @@ const useUserStore = create(
   persist(
     (set) => ({
       user: null,
-      isAuthencated: false,
+      isAuthenticated : false,
 
       setUser: (userData: any) =>
         set(() => ({
           user: userData,
-          isAuthencated: true,
+          isAuthenticated: true,
         })),
 
       clear: () =>
         set(() => ({
           user: null,
-          isAuthencated: false,
+          isAuthenticated : false,
         })),
     }),
     {

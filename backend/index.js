@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 const server=http.createServer(app)
-const io=initializeSocket(server)
+const io=await initializeSocket(server)
 
 //apply socket middleware before routes
 app.use((req,res,next)=>{
