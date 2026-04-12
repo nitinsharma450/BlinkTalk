@@ -26,9 +26,7 @@ export default function Login() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [error, setError] = useState("");
-  const [profilePictureFile, setProfilePictureFile] = useState("");
-  const [profilePicture, setProfilePicture] = useState("");
-  const [avatar, setAvatar] = useState(avatars[0]);
+  
   const [showDropDown, setShowDropDown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -158,7 +156,7 @@ export default function Login() {
     return response?.data;
   }
 
-  async function checkAuth() {
+   async function checkAuth() {
     try {
       let response = await axiosInstance.post("/api/auth/checkauth");
       if (response.data.status == 200) {
